@@ -50,35 +50,26 @@ setup_docker() {
     apt-get update
     apt-get -y install docker-ce docker-ce-cli containerd.io
     apt-get -y upgrade
+
+    # Add vagrant user to docker group
+    usermod -a -G docker vagrant
 }
 
 pull_docker_image() {
     step "Pull docker image"
     docker pull throwtheswitch/drsurly-course1:latest
-}
 
-setup_directories_MPU() {
-    step "Install repos for MPU yocto build"
-    # Clean up prior provisioning
-    rm -rf /home/vagrant/Projects/MPU-yocto
-    mkdir -p /home/vagrant/Projects/MPU-yocto
-    cd /home/vagrant/Projects/MPU-yocto
+    # Make directory to share with docker
+    mkdir -p /home/vagrant/Projects/lab 
 
-    # Clone repos for build.  From: https://www.linux4sam.org/bin/view/Linux4SAM/Sama5d2XplainedMainPage#Build_Yocto_Poky_rootfs_from_sou
-    git clone https://git.yoctoproject.org/poky -b dunfell
-    git clone https://git.openembedded.org/meta-openembedded -b dunfell
-    git clone https://github.com/aws/meta-aws -b dunfell
-    git clone https://github.com/linux4sam/meta-atmel.git -b dunfell
-}
+    # Fix permissions
+    chown -R vagrant:vagrant /home/vagrant/Projects
 
-setup_set_permissions() {
-    step "Set permissions"
-    sudo chown -R vagrant:vagrant /home/vagrant/Projects
+    # Install content
+    docker run -t --rm -v /home/vagrant/Projects/lab:/lab throwtheswitch/drsurly-course1 course setup
 }
 
 setup_timezone
 setup_update_packages
 setup_docker
 pull_docker_image
-#setup_directories_MPU
-#setup_set_permissions
