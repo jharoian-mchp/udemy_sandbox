@@ -22,6 +22,7 @@ setup_update_packages() {
     # Get current
     apt-get update
     apt-get -y upgrade
+    apt-get -y dist-upgrade
 
     # Clean up
     apt-get -y autoremove
@@ -48,6 +49,12 @@ setup_docker() {
     # Update apt and install Docker
     apt-get update
     apt-get -y install docker-ce docker-ce-cli containerd.io
+    apt-get -y upgrade
+}
+
+pull_docker_image() {
+    step "Pull docker image"
+    docker pull throwtheswitch/drsurly-course1:latest
 }
 
 setup_directories_MPU() {
@@ -64,19 +71,6 @@ setup_directories_MPU() {
     git clone https://github.com/linux4sam/meta-atmel.git -b dunfell
 }
 
-setup_directories_pfSoC() {
-    step "Install repos for pfSoC yocto build"
-    # Clean up prior provisioning
-    rm -rf /home/vagrant/Projects/pfSoC-yocto
-    mkdir -p /home/vagrant/Projects/pfSoC-yocto
-    cd /home/vagrant/Projects/pfSoC-yocto
-
-    # Clone repos for build.  From: https://github.com/polarfire-soc/meta-polarfire-soc-yocto-bsp
-    repo init -u https://github.com/polarfire-soc/meta-polarfire-soc-yocto-bsp.git -b master -m tools/manifests/riscv-yocto.xml
-    repo sync
-    repo rebase
-}
-
 setup_set_permissions() {
     step "Set permissions"
     sudo chown -R vagrant:vagrant /home/vagrant/Projects
@@ -85,6 +79,6 @@ setup_set_permissions() {
 setup_timezone
 setup_update_packages
 setup_docker
+pull_docker_image
 #setup_directories_MPU
-#setup_directories_pfSoC
-#tup_set_permissions
+#setup_set_permissions

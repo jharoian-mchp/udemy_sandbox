@@ -17,11 +17,18 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
     # Set name for ease of identifying in VB GUI
     vb.name = "Throw The Switch"
-    # Set memory & cpus to same as WSL2 (75-80% of machine RAM).  24GB on 32GB machine
-    vb.memory = 24576
-    vb.cpus = 10
+    # Set memory & cpus
+    vb.memory = 8192
+    vb.cpus = 4
   end
 
   # Launch shell script for provisioning the VM
   config.vm.provision:shell, path: "bootstrap.sh"
+
+  # Reboot after provisioning
+  config.vm.provision :shell do |shell|
+    shell.privileged = true
+    shell.inline = 'echo Rebooting...'
+    shell.reboot = true
+  end
 end
